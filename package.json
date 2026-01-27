@@ -1,0 +1,51 @@
+{
+  "name": "cocoon",
+  "description": "AI-powered feed filter for X/Twitter. Keep the good stuff, hide the rest.",
+  "version": "1.0.2",
+  "license": "GPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cocoon-extension/cocoon"
+  },
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "dev:build": "wxt build --mode development",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "release": "node scripts/release.mjs",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@ghostery/adblocker": "^2.13.2",
+    "@lucide/svelte": "^0.500.0",
+    "hls.js": "^1.6.15",
+    "sql.js": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/sql.js": "^1.4.9",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/chrome": "^0.0.300",
+    "@wxt-dev/module-svelte": "^2.0.0",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "prettier": "^3.0.0",
+    "prettier-plugin-svelte": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^3.4.19",
+    "tslib": "^2.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0",
+    "vite-plugin-top-level-await": "^1.0.0",
+    "vite-plugin-wasm": "^3.0.0",
+    "wxt": "^0.19.0"
+  }
+}

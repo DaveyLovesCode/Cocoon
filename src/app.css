@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Poppins Font Family - for bold headings */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins/poppins-v24-latin-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins/poppins-v24-latin-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins/poppins-v24-latin-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins/poppins-v24-latin-800.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  /* Default theme (Cocoon) - warm, earthy, light */
+  :root {
+    --cocoon-bg: #E8E4DE;
+    --cocoon-surface: #F5F1EB;
+    --cocoon-elevated: #EBE7E1;
+    --cocoon-text: #3D3630;
+    --cocoon-muted: #7A7067;
+    --cocoon-accent: #8B7355;
+    --cocoon-accent-fg: #FFFFFF;
+    --cocoon-border: #D4CFC7;
+    --cocoon-dim: #E0DCD6;
+
+    /* Brand accents for onboarding */
+    --cocoon-coral: #FF9F8E;
+    --cocoon-mint: #A8E6CF;
+    --cocoon-lavender: #D4BBDD;
+
+    /* Font families */
+    --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--cocoon-bg);
+    color: var(--cocoon-text);
+    overflow-x: hidden;
+  }
+
+  /* Light theme scrollbar */
+  [data-theme-type="light"] ::-webkit-scrollbar,
+  :root:not([data-theme-type]) ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  [data-theme-type="light"] ::-webkit-scrollbar-track,
+  :root:not([data-theme-type]) ::-webkit-scrollbar-track {
+    background: var(--cocoon-bg);
+  }
+
+  [data-theme-type="light"] ::-webkit-scrollbar-thumb,
+  :root:not([data-theme-type]) ::-webkit-scrollbar-thumb {
+    background: var(--cocoon-border);
+    border-radius: 6px;
+    border: 3px solid var(--cocoon-bg);
+  }
+
+  [data-theme-type="light"] ::-webkit-scrollbar-thumb:hover,
+  :root:not([data-theme-type]) ::-webkit-scrollbar-thumb:hover {
+    background: var(--cocoon-muted);
+  }
+
+  /* Dark theme scrollbar */
+  [data-theme-type="dark"] ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  [data-theme-type="dark"] ::-webkit-scrollbar-track {
+    background: var(--cocoon-bg);
+  }
+
+  [data-theme-type="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--cocoon-border);
+    border-radius: 6px;
+    border: 3px solid var(--cocoon-bg);
+  }
+
+  [data-theme-type="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--cocoon-elevated);
+  }
+}

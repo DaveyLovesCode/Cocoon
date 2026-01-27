@@ -1,0 +1,627 @@
+/* Injected at document_start - before any DOM construction */
+
+/* Theme CSS variables - set by hide-immediate.js based on platform/settings */
+:root {
+  /* Fallback to Twitter Lights Out for feed sites, applied before JS runs */
+  --cocoon-bg: #000000;
+  --cocoon-surface: #16181C;
+  --cocoon-elevated: #202327;
+  --cocoon-text: #E7E9EA;
+  --cocoon-muted: #71767B;
+  --cocoon-accent: #1D9BF0;
+  --cocoon-border: #2F3336;
+  --cocoon-dim: #0F1114;
+}
+
+html:not([data-cocoon-ready="true"]) {
+  background: var(--cocoon-bg) !important;
+}
+
+/* Hide everything until ready (prevents any first-paint flash) */
+html:not([data-cocoon-ready="true"]) body,
+html:not([data-cocoon-ready="true"]) body * {
+  visibility: hidden !important;
+}
+
+/* Overlay base styles - uses theme variables */
+#__cocoon_overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  background: var(--cocoon-bg) !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  color: var(--cocoon-text) !important;
+  visibility: visible !important;
+}
+
+/* Isolate layout from host page CSS load order */
+#__cocoon_overlay,
+#__cocoon_overlay *,
+#__cocoon_overlay *::before,
+#__cocoon_overlay *::after {
+  box-sizing: border-box !important;
+}
+
+/* Shell layout (content mode) */
+#__cocoon_overlay.cocoon-content-mode {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Shell header - floats over content */
+.cocoon-shell-header {
+  position: absolute;
+  top: 12px;
+  left: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cocoon-header-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--cocoon-surface) 90%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--cocoon-border);
+  border-radius: 9999px;
+}
+
+.cocoon-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cocoon-text);
+  letter-spacing: 0.02em;
+}
+
+.cocoon-settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--cocoon-muted);
+  transition: color 0.15s;
+}
+
+.cocoon-settings-btn:hover {
+  color: var(--cocoon-text);
+}
+
+.cocoon-search-wrapper {
+  position: relative;
+}
+
+.cocoon-search-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: color-mix(in srgb, var(--cocoon-surface) 90%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--cocoon-border);
+  border-radius: 9999px;
+  color: var(--cocoon-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.cocoon-search-toggle:hover {
+  background: var(--cocoon-elevated);
+}
+
+.cocoon-search-form {
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.cocoon-search-form.cocoon-search-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cocoon-search-input {
+  width: 240px;
+  padding: 8px 16px;
+  background: var(--cocoon-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--cocoon-border);
+  border-radius: 9999px;
+  font-size: 14px;
+  color: var(--cocoon-text);
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cocoon-search-input:focus {
+  border-color: var(--cocoon-accent);
+}
+
+/* Sidebar nav */
+.cocoon-sidebar-nav {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64px;
+  background: var(--cocoon-surface);
+  border: 1px solid var(--cocoon-border);
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hide sidebar when empty (no nav items yet) */
+.cocoon-sidebar-nav.cocoon-sidebar-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(-10px);
+}
+
+.cocoon-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--cocoon-text);
+  transition: all 0.2s ease;
+}
+
+.cocoon-nav-link:hover {
+  background: var(--cocoon-elevated);
+  transform: scale(1.08);
+}
+
+.cocoon-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cocoon-nav-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.cocoon-nav-icon svg,
+.cocoon-nav-icon svg path,
+.cocoon-nav-icon svg circle,
+.cocoon-nav-icon svg rect,
+.cocoon-nav-icon svg polygon {
+  fill: var(--cocoon-text) !important;
+}
+
+/* Compose button - accent colored */
+.cocoon-compose-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--cocoon-accent);
+  color: var(--cocoon-accent-fg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cocoon-compose-btn:hover {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+.cocoon-compose-btn:active {
+  transform: scale(0.95);
+}
+
+.cocoon-compose-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Force icon color to match button foreground */
+.cocoon-compose-btn svg,
+.cocoon-compose-btn svg path,
+.cocoon-compose-btn svg g {
+  fill: var(--cocoon-accent-fg) !important;
+  stroke: none !important;
+}
+
+/* Main content area */
+.cocoon-main-content {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+  padding-left: 104px; /* 20px left + 64px nav + 20px gap */
+  padding-top: 56px; /* visual breathing room below floating header */
+}
+
+/* Feed fade overlays - opacity controlled by JS based on scroll */
+.cocoon-fade-top,
+.cocoon-fade-bottom {
+  position: absolute;
+  left: 104px; /* Match main content padding */
+  right: 0;
+  height: 78px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+}
+
+.cocoon-fade-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--cocoon-bg) 0%, color-mix(in srgb, var(--cocoon-bg) 35%, transparent) 55%, transparent 100%);
+}
+
+.cocoon-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--cocoon-bg) 0%, color-mix(in srgb, var(--cocoon-bg) 35%, transparent) 55%, transparent 100%);
+}
+
+@supports (scrollbar-gutter: stable) {
+  .cocoon-main-content {
+    scrollbar-gutter: stable;
+  }
+}
+
+/* Feed status - appears at bottom of feed during loading */
+.cocoon-feed-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.cocoon-feed-status-enter {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.cocoon-feed-status-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#__cocoon_overlay .cocoon-feed-status .loader {
+  width: 18px;
+  height: 18px;
+}
+
+#__cocoon_overlay .cocoon-feed-status .loader::after {
+  inset: 3px;
+}
+
+.cocoon-feed-status .shimmer-text {
+  margin-top: 0;
+}
+
+/* Legacy loading state in main content */
+.cocoon-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+html:not([data-cocoon-ready="true"]) #__cocoon_overlay,
+html:not([data-cocoon-ready="true"]) #__cocoon_overlay * {
+  visibility: visible !important;
+}
+
+/* Loading spinner */
+#__cocoon_overlay .loader {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+#__cocoon_overlay .loader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--cocoon-accent);
+  animation: cocoon-spin 1s linear infinite;
+}
+
+#__cocoon_overlay .loader::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--cocoon-border);
+  animation: cocoon-spin 0.6s linear infinite reverse;
+}
+
+@keyframes cocoon-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Loading status text */
+#__cocoon_overlay .text {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cocoon-muted);
+  margin-top: 32px;
+}
+
+/* Shimmer text animation - staggered letter fade */
+@keyframes cocoon-shimmer-text {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.shimmer-text {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cocoon-muted);
+  margin-top: 16px;
+}
+
+.shimmer-char {
+  display: inline-block;
+  animation: cocoon-shimmer-text 1.5s ease-in-out infinite;
+}
+
+/* Skeleton loading animation - subtle opacity pulse */
+@keyframes cocoon-skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+.skeleton-bone {
+  background: var(--cocoon-elevated);
+  border-radius: 4px;
+  animation: cocoon-skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* Skeleton item structure */
+.cocoon-skeleton {
+  background: var(--cocoon-surface);
+  border: 1px solid var(--cocoon-border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  will-change: height, opacity, margin, transform;
+  transition: height 520ms cubic-bezier(0.16, 1, 0.3, 1), opacity 360ms ease-out, margin 520ms cubic-bezier(0.16, 1, 0.3, 1), transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cocoon-skeleton-enter {
+  height: 0 !important;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.cocoon-skeleton-enter:not(:last-child) {
+  margin-bottom: -12px;
+}
+
+.cocoon-skeleton-enter .skeleton-inner {
+  opacity: 0;
+}
+
+.cocoon-skeleton .skeleton-inner {
+  padding: 16px;
+  transition: opacity 320ms ease-out;
+}
+
+.cocoon-skeleton .skeleton-content {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+}
+
+.cocoon-skeleton.morphing .skeleton-inner {
+  opacity: 0;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  padding: 0;
+  pointer-events: none;
+}
+
+.cocoon-skeleton.morphing .skeleton-content {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 420ms ease-out 80ms;
+}
+
+.cocoon-skeleton.collapsing {
+  height: 0 !important;
+  opacity: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Skeleton bone elements */
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-handle {
+  width: 120px;
+  height: 14px;
+}
+
+.skeleton-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line {
+  height: 14px;
+}
+
+.skeleton-line-full { width: 100%; }
+.skeleton-line-3-4 { width: 75%; }
+.skeleton-line-half { width: 50%; }
+.skeleton-line-1-4 { width: 25%; }
+
+/* Skeleton container in main content */
+.cocoon-skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+.cocoon-skeleton-container .cocoon-feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Blocking error state */
+#__cocoon_overlay .cocoon-error-title {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cocoon-text);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#__cocoon_overlay .cocoon-error-message {
+  margin-top: 10px;
+  max-width: 560px;
+  padding: 0 18px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cocoon-muted);
+  white-space: pre-wrap;
+}
+
+#__cocoon_overlay .cocoon-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+#__cocoon_overlay .cocoon-btn {
+  appearance: none;
+  border: 1px solid var(--cocoon-border);
+  background: var(--cocoon-surface);
+  color: var(--cocoon-text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+#__cocoon_overlay .cocoon-btn:hover {
+  background: var(--cocoon-elevated);
+}
+
+#__cocoon_overlay .cocoon-btn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+#__cocoon_overlay .cocoon-btn-danger {
+  border-color: #67292D;
+  background: #1C0E10;
+  color: #F4212E;
+}
+
+#__cocoon_overlay .cocoon-btn-danger:hover {
+  background: #2A1216;
+}
+
+/* Fade-out transition for overlay */
+#__cocoon_overlay {
+  transition: opacity 300ms ease-out !important;
+}
+
+#__cocoon_overlay.fading-out {
+  opacity: 0 !important;
+}
+
+/* Hide elements marked by Cocoon */
+[data-cocoon-hide="true"] {
+  display: none !important;
+}
+
+/* Scrollbar theming for overlay */
+#__cocoon_overlay ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+#__cocoon_overlay ::-webkit-scrollbar-track {
+  background: var(--cocoon-bg);
+}
+
+#__cocoon_overlay ::-webkit-scrollbar-thumb {
+  background: var(--cocoon-border);
+  border-radius: 6px;
+  border: 3px solid var(--cocoon-bg);
+}
+
+#__cocoon_overlay ::-webkit-scrollbar-thumb:hover {
+  background: var(--cocoon-elevated);
+}
