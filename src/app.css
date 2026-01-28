@@ -65,6 +65,14 @@
     overflow-x: hidden;
   }
 
+  /* Placeholder text styling */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--cocoon-muted) !important;
+    opacity: 0.5 !important;
+    -webkit-text-fill-color: var(--cocoon-muted);
+  }
+
   /* Light theme scrollbar */
   [data-theme-type="light"] ::-webkit-scrollbar,
   :root:not([data-theme-type]) ::-webkit-scrollbar {

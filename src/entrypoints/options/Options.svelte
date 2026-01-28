@@ -144,14 +144,14 @@
   }
 </script>
 
-<div class="min-h-screen bg-cocoon-bg text-cocoon-text font-sans flex">
+<div class="h-screen overflow-hidden bg-cocoon-bg text-cocoon-text font-sans flex">
   {#if !ready}
     <div class="flex-1 flex items-center justify-center py-20">
       <div class="text-cocoon-muted text-sm">Loading...</div>
     </div>
   {:else}
   <!-- Sidebar -->
-  <aside class="w-56 min-h-screen border-r border-cocoon-border bg-cocoon-surface flex flex-col">
+  <aside class="w-56 h-full border-r border-cocoon-border bg-cocoon-surface flex flex-col">
     <div class="p-4 border-b border-cocoon-border">
       <div class="flex items-center gap-2.5">
         <Logo size={24} mouthProgress={1} color="#A8E6CF" />
