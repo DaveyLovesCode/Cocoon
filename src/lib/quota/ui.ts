@@ -6,6 +6,36 @@ import { OVERLAY_ID } from '../constants';
 import { stopInitialSkeletonReveal } from '../components/skeleton';
 import type { QuotaStatus } from './index';
 
+const APPROACHING_LIMIT_THRESHOLD = 10;
+const QUOTA_WARNING_CLASS = 'cocoon-quota-warning-item';
+let lastWarningStatus: { enabled: boolean; remaining: number } | null = null;
+let warningRetryAttached = false;
+let warningRetryRaf = 0;
+
+function attachWarningRetryHandlers(): void {
+  if (warningRetryAttached) return;
+  warningRetryAttached = true;
+
+  const schedule = () => {
+    if (warningRetryRaf) return;
+    warningRetryRaf = requestAnimationFrame(() => {
+      warningRetryRaf = 0;
+
+      if (!lastWarningStatus) return;
+      const overlay = document.getElementById(OVERLAY_ID);
+      if (!overlay) return;
+      const feedContainer = overlay.querySelector('.cocoon-feed-container');
+      if (!feedContainer) return;
+      if (feedContainer.querySelector(`.${QUOTA_WARNING_CLASS}`)) return;
+
+      upsertQuotaWarningInFeed(lastWarningStatus);
+    });
+  };
+
+  document.addEventListener('scroll', schedule, { passive: true, capture: true });
+  window.addEventListener('resize', schedule, { passive: true });
+}
+
 /**
  * Format time remaining for quota reset.
  */
@@ -33,6 +63,7 @@ export function showQuotaBlocker(status: QuotaStatus): void {
 
   stopInitialSkeletonReveal();
   overlay.classList.add('cocoon-content-mode');
+  upsertQuotaWarningInFeed(null);
 
   const timeRemaining = formatTimeRemaining(status.resetsAt);
 
@@ -78,6 +109,8 @@ export function showQuotaLimitReached(status: QuotaStatus): void {
   const footer = overlay.querySelector('.cocoon-feed-footer');
   if (!footer) return;
 
+  upsertQuotaWarningInFeed(null);
+
   const timeRemaining = formatTimeRemaining(status.resetsAt);
 
   footer.innerHTML = `
@@ -118,35 +151,82 @@ function getIndicatorInnerHtml(remaining: number): string {
  */
 export function getQuotaIndicatorHtml(status: { enabled: boolean; remaining: number } | null): string {
   if (!status?.enabled) return '';
-  if (status.remaining <= 0 || status.remaining > 10) return '';
+  if (status.remaining <= 0 || status.remaining > APPROACHING_LIMIT_THRESHOLD) return '';
 
-  return `<div class="cocoon-quota-indicator">${getIndicatorInnerHtml(status.remaining)}</div>`;
+  return `<div class="cocoon-quota-indicator ${QUOTA_WARNING_CLASS}" data-cocoon-system="quota-warning" data-quota-exempt="true">${getIndicatorInnerHtml(status.remaining)}</div>`;
 }
 
 /**
- * Update the quota indicator slot with current remaining count.
- * The slot must exist in the DOM (created during feed render).
+ * Ensure the approaching-limit warning exists in the feed and is updated.
+ * Inserts below the fold so it doesn't shift what the user is currently reading.
  */
-export function showApproachingLimitIndicator(remaining: number): void {
+export function upsertQuotaWarningInFeed(status: { enabled: boolean; remaining: number } | null): void {
   const overlay = document.getElementById(OVERLAY_ID);
   if (!overlay) return;
 
-  const slot = overlay.querySelector('.cocoon-quota-indicator-slot');
-  if (!slot) return;
+  const feedContainer = overlay.querySelector('.cocoon-feed-container');
+  if (!feedContainer) return;
 
-  slot.innerHTML = `<div class="cocoon-quota-indicator">${getIndicatorInnerHtml(remaining)}</div>`;
+  const shouldShow = !!status?.enabled
+    && status.remaining > 0
+    && status.remaining <= APPROACHING_LIMIT_THRESHOLD;
+
+  const existing = feedContainer.querySelector(`.${QUOTA_WARNING_CLASS}`) as HTMLElement | null;
+
+  if (!shouldShow) {
+    lastWarningStatus = null;
+    existing?.remove();
+    return;
+  }
+
+  lastWarningStatus = status;
+  attachWarningRetryHandlers();
+
+  const remaining = status.remaining;
+
+  if (existing) {
+    existing.innerHTML = getIndicatorInnerHtml(remaining);
+    injectStyles();
+    return;
+  }
+
+  const el = document.createElement('div');
+  el.className = `cocoon-quota-indicator ${QUOTA_WARNING_CLASS}`;
+  el.dataset.cocoonSystem = 'quota-warning';
+  el.dataset.quotaExempt = 'true';
+  el.innerHTML = getIndicatorInnerHtml(remaining);
+
+  // Anchor insertion below the fold so it doesn't shift what the user is currently reading.
+  const scrollContainer = (overlay.querySelector('.cocoon-main-content') as HTMLElement | null) || overlay;
+  const viewport = scrollContainer.getBoundingClientRect();
+  const candidates = Array.from(
+    feedContainer.querySelectorAll('.cocoon-item:not(.cocoon-skeleton)')
+  ) as HTMLElement[];
+
+  const belowFold = candidates.filter(item => item.getBoundingClientRect().top >= viewport.bottom + 16);
+
+  // Prefer an item that hasn't been counted as viewed yet (not brought into the fold long enough to count).
+  const uncountedBelowFold = belowFold.find(item => !item.hasAttribute('data-quota-counted'));
+  const anchor = uncountedBelowFold || belowFold[0] || null;
+
+  if (!anchor || anchor.parentElement !== feedContainer) return;
+  anchor.insertAdjacentElement('afterend', el);
+
   injectStyles();
 }
 
 /**
- * Clear the quota indicator slot.
+ * Backwards-compatible wrapper: update the warning based on remaining count.
+ */
+export function showApproachingLimitIndicator(remaining: number): void {
+  upsertQuotaWarningInFeed({ enabled: true, remaining });
+}
+
+/**
+ * Clear the warning from the feed.
  */
 export function removeApproachingLimitIndicator(): void {
-  const overlay = document.getElementById(OVERLAY_ID);
-  if (!overlay) return;
-
-  const slot = overlay.querySelector('.cocoon-quota-indicator-slot');
-  if (slot) slot.innerHTML = '';
+  upsertQuotaWarningInFeed(null);
 }
 
 /**

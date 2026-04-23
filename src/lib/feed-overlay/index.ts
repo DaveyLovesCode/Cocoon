@@ -32,7 +32,7 @@ import {
   getCachedComposeSvg,
 } from '../cache';
 import { observeNewItems as notifyQuotaObserver, getCurrentQuotaStatus } from '../quota/observer';
-import { getQuotaIndicatorHtml } from '../quota/ui';
+import { upsertQuotaWarningInFeed } from '../quota/ui';
 
 // Re-export FeedItem for caching
 export type { FeedItem } from '../platforms';
@@ -394,22 +394,17 @@ export async function morphSkeletonsToContent(
     }
   }
 
-  // Add indicator slot and footer
+  // Add footer
   const parent = feedContainer.parentElement;
   if (parent) {
-    if (!parent.querySelector('.cocoon-quota-indicator-slot')) {
-      const slot = document.createElement('div');
-      slot.className = 'cocoon-quota-indicator-slot';
-      const quotaStatus = getCurrentQuotaStatus();
-      slot.innerHTML = getQuotaIndicatorHtml(quotaStatus);
-      parent.appendChild(slot);
-    }
     if (!parent.querySelector('.cocoon-feed-footer')) {
       const footer = document.createElement('div');
       footer.className = 'cocoon-feed-footer';
       parent.appendChild(footer);
     }
   }
+
+  upsertQuotaWarningInFeed(getCurrentQuotaStatus());
 
   attachOverlayHandlers(overlay);
   platform.init?.initializeVideoPlayers().catch(err => {
@@ -538,7 +533,6 @@ function renderFeedItemsDirectly(
     : feedItems.map((item, i) => platform.adapter.renderItem(item, i)).join('');
 
   const quotaStatus = getCurrentQuotaStatus();
-  const indicatorHtml = getQuotaIndicatorHtml(quotaStatus);
   const footerHtml = isEmpty ? '' : '<div class="cocoon-feed-footer"></div>';
 
   injectStyles(platform);
@@ -560,12 +554,13 @@ function renderFeedItemsDirectly(
           <div class="cocoon-feed-container flex flex-col gap-3">
             ${contentHtml}
           </div>
-          <div class="cocoon-quota-indicator-slot">${indicatorHtml}</div>
           ${footerHtml}
         </div>
       </div>
     </div>
   `;
+
+  if (!isEmpty) upsertQuotaWarningInFeed(quotaStatus);
 
   attachOverlayHandlers(overlay);
   platform.init?.initializeVideoPlayers().catch(() => {});
@@ -1148,7 +1143,6 @@ export function renderFeedItems(
     : feedItems.map((item, i) => platform.adapter.renderItem(item, i)).join('');
 
   const quotaStatus = getCurrentQuotaStatus();
-  const indicatorHtml = getQuotaIndicatorHtml(quotaStatus);
   const footerHtml = isEmpty ? '' : '<div class="cocoon-feed-footer"></div>';
 
   let mainContent = overlay.querySelector('.cocoon-main-content');
@@ -1167,12 +1161,13 @@ export function renderFeedItems(
           <div class="cocoon-feed-container flex flex-col gap-3">
             ${contentHtml}
           </div>
-          <div class="cocoon-quota-indicator-slot">${indicatorHtml}</div>
           ${footerHtml}
         </div>
       </div>
     </div>
   `;
+
+  if (!isEmpty) upsertQuotaWarningInFeed(quotaStatus);
 
   attachOverlayHandlers(overlay);
 
@@ -1353,6 +1348,7 @@ export function appendFeedItems(newItems: FeedItem[], startIndex: number): void 
 
   // Notify quota observer about new items
   notifyQuotaObserver();
+  upsertQuotaWarningInFeed(getCurrentQuotaStatus());
 }
 
 /**

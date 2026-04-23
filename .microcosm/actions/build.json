@@ -1,0 +1,16 @@
+{
+  "id": "cmd-c2639467-46e8-41bb-a4ee-33b119611943",
+  "type": "shell",
+  "displayName": "Build",
+  "enabled": false,
+  "triggerMode": "manual",
+  "autoRestart": false,
+  "command": "npm run build",
+  "prompt": "",
+  "model": "haiku",
+  "disallowedTools": [],
+  "dangerouslySkipPermissions": false,
+  "extendedThinking": false,
+  "maxTurns": 3,
+  "order": 0
+}

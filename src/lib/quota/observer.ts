@@ -34,12 +34,10 @@ async function flushPendingViews(): Promise<void> {
     currentStatus = await recordViewedPosts(count, currentPlatform);
     log.info(`Recorded ${count} view(s). Total: ${currentStatus.viewed}`);
 
-    if (currentStatus.enabled) {
-      if (currentStatus.remaining <= APPROACHING_LIMIT_THRESHOLD && currentStatus.remaining > 0) {
-        showApproachingLimitIndicator(currentStatus.remaining);
-      } else {
-        removeApproachingLimitIndicator();
-      }
+    if (currentStatus.enabled && currentStatus.remaining <= APPROACHING_LIMIT_THRESHOLD && currentStatus.remaining > 0) {
+      showApproachingLimitIndicator(currentStatus.remaining);
+    } else {
+      removeApproachingLimitIndicator();
     }
   } catch (e) {
     log.error('Failed to record views', e);
@@ -57,6 +55,9 @@ function countView(element: Element): void {
   if (countedItems.has(element)) return;
   countedItems.add(element);
   itemTimers.delete(element);
+  if (element instanceof HTMLElement) {
+    element.dataset.quotaCounted = 'true';
+  }
 
   pendingCount++;
   scheduleFlush();

@@ -226,7 +226,7 @@
   }
 
   function openSettings() {
-    browser.runtime.openOptionsPage();
+    browser.tabs.create({ url: browser.runtime.getURL('/options.html') });
   }
 
   async function copyDebugData() {
